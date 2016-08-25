@@ -22,7 +22,8 @@ void print0(size_t count)
  ***********************************************************************/ 
 void *thread0(void *cmd)
 {
-    while(1)
+    sleep(3);
+	while(1)
     {
         pthread_rwlock_rdlock(&rwlock);
         print0(100);

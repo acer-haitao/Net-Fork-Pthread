@@ -39,7 +39,7 @@ void parent()
 
     while(i--)
     {
-        print0(100);
+        print0(10);
     }
 }
 
@@ -49,7 +49,7 @@ void child()
 
     while(i--)
     {
-        print1(100);
+        print1(10);
     }
 }
 
@@ -66,13 +66,13 @@ int main(void)
         debug_error("fork error");
         exit(-1);
     } 
-    else if (pid > 0) 
+    else if (pid > 0) //父进程
     { /* parent */
         parent();
-        wait(&status);
+        wait(&status);//等待子进程结束
 
     }
-    else
+    else 
     { /* child */
         usleep(200);
         child();

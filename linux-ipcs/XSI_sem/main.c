@@ -102,7 +102,7 @@ void parent()
     int semid;
     int ret;
 
-    ret = semid_init(&semid);
+    ret = semid_init(&semid);//初始化信号量
     if (ret < 0)
     {
         exit(-1);
@@ -156,4 +156,4 @@ int main(void)
 }
 
 
-
+ 

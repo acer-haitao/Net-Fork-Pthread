@@ -37,7 +37,7 @@ void parent()
         return;
     }
 
-    sprintf(addr, "I am parent");
+    sprintf(addr, "I am parent");//父进程往共享内存里写入
 
     usleep(500);
     ret = shmctl(shmid, IPC_RMID, NULL);
@@ -62,7 +62,7 @@ void child()
     
     addr = shmat(shmid, 0, 0);
     
-    memcpy(buf, addr, 1024);
+    memcpy(buf, addr, 1024);//子进程从共享内存读数据
     debug_info("buf is: %s\n", buf);
 }
 

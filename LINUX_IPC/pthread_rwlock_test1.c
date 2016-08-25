@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	pthread_t a_thread, b_thread, c_thread, d_thread;
 	void *thread_result;
 
-	retval = pthread_rwlock_init(&rwlock, NULL);
+	retval = pthread_rwlock_init(&rwlock, NULL);//动态初始化
 	if (retval != 0) {
 		perror("rwlock initialization failed\n");
 		exit(EXIT_FAILURE);
@@ -42,22 +42,29 @@ int main(int argc, char *argv[])
 		perror("thread create failed\n");
 		exit(EXIT_FAILURE);
 	}
+	printf("创建读线程1\n");
+
 	retval = pthread_create(&b_thread, NULL, thread_to_read_t, NULL);
 	if (retval != 0) {
 		perror("thread create failed\n");
 		exit(EXIT_FAILURE);
 	}
+	printf("创建读线程2\n");
+
 	retval = pthread_create(&c_thread, NULL, thread_to_write_o, NULL);
 	if (retval != 0) {
 		perror("thread create failed\n");
 		exit(EXIT_FAILURE);
 	}
+	printf("创建写线程1\n");
+
 	retval = pthread_create(&d_thread, NULL, thread_to_write_t, NULL);
 	if (retval != 0) {
 		perror("thread create failed\n");
 		exit(EXIT_FAILURE);
 	}
-
+	printf("创建写线程2\n");
+	/*等待线程结束*/
 	retval = pthread_join(a_thread, &thread_result);
 	if (retval != 0) {
 		perror("thread join failed\n");
@@ -83,16 +90,19 @@ int main(int argc, char *argv[])
 	exit(EXIT_FAILURE);
 }
 
-void *thread_to_read_o(void *arg)
+void *thread_to_read_o(void *arg)//读线程1
 {
-	printf("thread read one try to get lock\n");
+	//printf("thread read one try to get lock\n");
+	printf("读线程1试图获取读写锁\n");
 
 	pthread_rwlock_rdlock(&rwlock);//获取读取锁
 	while (strncmp("end", work_area, 3) != 0) {
-		printf("this is thread read one\n");
-		printf("the characters is %s", work_area);
+			printf("这是读线程1\n");
+			printf("读出的字符是：%s\n", work_area);
+
 		pthread_rwlock_unlock(&rwlock);
 		sleep(2);
+
 		pthread_rwlock_rdlock(&rwlock);
 		while (work_area[0] == '\0') {
 			pthread_rwlock_unlock(&rwlock);
@@ -101,18 +111,20 @@ void *thread_to_read_o(void *arg)
 		}
 	}
 	pthread_rwlock_unlock(&rwlock);
+
 	time_to_exit = 1;
 	pthread_exit(0);
 }
 
-void *thread_to_read_t(void *arg)
+void *thread_to_read_t(void *arg)//读线程2
 {
-	printf("thread read one try to get lock\n");
+	//printf("thread read one try to get lock\n");
+	printf("读线程2试图获取读写锁\n");
 
 	pthread_rwlock_rdlock(&rwlock);
 	while (strncmp("end", work_area, 3) != 0) {
-		printf("this is thread read two\n");
-		printf("the characters is %s\n", work_area);
+		printf("这是读线程2\n");
+		printf("读出的字符是：%s\n", work_area);
 		pthread_rwlock_unlock(&rwlock);
 		sleep(5);
 		pthread_rwlock_rdlock(&rwlock);
@@ -127,12 +139,13 @@ void *thread_to_read_t(void *arg)
 	pthread_exit(0);
 }
 
-void *thread_to_write_o(void *arg)
+void *thread_to_write_o(void *arg)//写线程1
 {
-	printf("this is write thread one try to get lock\n");
+	//printf("this is write thread one try to get lock\n");
+	printf("写线程1试图获取读写锁\n");
 	while (!time_to_exit) {
 		pthread_rwlock_wrlock(&rwlock);
-		printf("this is write thread one\n. Input some text. Enter 'end' to finish\n");
+		printf("这是写线程1\n. 请输入字符串或者end结束\n");
 		fgets(work_area, WORK_SIZE, stdin);
 		pthread_rwlock_unlock(&rwlock);
 		sleep(15);
@@ -141,12 +154,12 @@ void *thread_to_write_o(void *arg)
 	pthread_exit(0);
 }
 
-void *thread_to_write_t(void *arg)
+void *thread_to_write_t(void *arg)//写线程2
 {
 	sleep(10);
 	while (!time_to_exit) {
 		pthread_rwlock_wrlock(&rwlock);
-		printf("this is write thread two\nInput some text.Enter 'end' to finish\n");
+		printf("这是写线程2\n请输入字符串或者end结束\n");
 		fgets(work_area, WORK_SIZE, stdin);
 		pthread_rwlock_unlock(&rwlock);
 		sleep(20);

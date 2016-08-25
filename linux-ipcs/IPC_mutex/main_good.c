@@ -102,7 +102,7 @@ void child()
     {
         perror("child shmget");
         return;
-    }
+    } 
 
     addr = shmat(shmid, 0, 0);
     p_mutex = (pthread_mutex_t *)addr;

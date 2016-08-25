@@ -19,6 +19,7 @@ void print1(size_t count)
 
 void *thread1(void *cmd)
 {
+	sleep(5);
     while(1)
     {
         pthread_rwlock_rdlock(&rwlock);
